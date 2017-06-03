@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 )
 
 func (c *Client) GetTickers(ctx context.Context) (*Tickers, error) {
@@ -34,15 +35,16 @@ type Tickers struct {
 }
 
 type Ticker struct {
-	Last          float64 `json:"last,string"`
-	LowestAsk     float64 `json:"lowestAsk,string"`
-	HighestBid    float64 `json:"highestBid,string"`
-	PercentChange float64 `json:"percentChange,string"`
-	BaseVolume    float64 `json:"baseVolume,string"`
-	QuoteVolume   float64 `json:"quoteVolume,string"`
-	IsFrozen      int     `json:"isFrozen,string"`
-	High24Hr      float64 `json:"high24hr,string"`
-	Low24Hr       float64 `json:"low24hr,string"`
+	Last          string    `json:"last"`
+	LowestAsk     string    `json:"lowestAsk"`
+	HighestBid    string    `json:"highestBid"`
+	PercentChange string    `json:"percentChange"`
+	BaseVolume    string    `json:"baseVolume"`
+	QuoteVolume   string    `json:"quoteVolume"`
+	IsFrozen      int       `json:"isFrozen,string"`
+	High24Hr      string    `json:"high24hr"`
+	Low24Hr       string    `json:"low24hr"`
+	Time          time.Time `json:"-"`
 }
 
 func (c *Client) GetCurrencies(ctx context.Context) (*Currencies, error) {
