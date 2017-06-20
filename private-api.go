@@ -39,6 +39,51 @@ type Balances struct {
 	Pair map[string]float64
 }
 
+func (c *Client) GetCompleteBalances(ctx context.Context) (CompleteBalances, error) {
+	resp, err := c.doPrivateAPIRequest(ctx, "returnCompleteBalances", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(resp.Status)
+	}
+
+	var ret map[string]interface{}
+	if err := c.decodeResponse(resp, &ret, nil); err != nil {
+		return nil, err
+	}
+	if msg, got := ret["error"]; got {
+		return nil, errors.New(msg.(string))
+	}
+
+	balances := []Balance{}
+	for k, v := range ret {
+		balance := v.(map[string]interface{})
+		i, err := strconv.ParseFloat(balance["btcValue"].(string), 64)
+		if i == 0 || err != nil {
+			continue
+		}
+		balances = append(balances, Balance{
+			Symbol:    k,
+			Available: balance["available"].(string),
+			OnOrders:  balance["onOrders"].(string),
+			BtcValue:  balance["btcValue"].(string),
+		})
+	}
+
+	return balances, nil
+}
+
+type CompleteBalances []Balance
+
+type Balance struct {
+	Symbol    string
+	Available string
+	OnOrders  string
+	BtcValue  string
+}
+
 func (c *Client) Withdraw(ctx context.Context, req WithdrawRequest) error {
 	v := url.Values{}
 	v.Add("currency", req.Currency)
