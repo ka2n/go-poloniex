@@ -49,29 +49,11 @@ func (c *Client) GetCompleteBalances(ctx context.Context) (CompleteBalances, err
 		return nil, errors.New(resp.Status)
 	}
 
-	var ret map[string]interface{}
+	var ret CompleteBalances
 	if err := c.decodeResponse(resp, &ret, nil); err != nil {
 		return nil, err
 	}
-	if msg, got := ret["error"]; got {
-		return nil, errors.New(msg.(string))
-	}
-
-	balances := make(CompleteBalances)
-	for k, v := range ret {
-		balance := v.(map[string]interface{})
-		i, err := strconv.ParseFloat(balance["btcValue"].(string), 64)
-		if i == 0 || err != nil {
-			continue
-		}
-		balances[k] = Balance{
-			Available: balance["available"].(string),
-			OnOrders:  balance["onOrders"].(string),
-			BtcValue:  balance["btcValue"].(string),
-		}
-	}
-
-	return balances, nil
+	return ret, nil
 }
 
 type CompleteBalances map[string]Balance
