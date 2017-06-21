@@ -1,0 +1,12 @@
+{
+    "LTC": {
+        "available": "5.015",
+        "onOrders": "1.0025",
+        "btcValue": "0.078"
+    },
+    "NXT": {
+        "available": "0",
+        "onOrders": "0",
+        "btcValue": "0"
+    }
+}
