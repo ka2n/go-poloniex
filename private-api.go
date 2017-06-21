@@ -109,7 +109,7 @@ func (c *Client) Withdraw(ctx context.Context, req WithdrawRequest) error {
 		return err
 	}
 
-	var ret WithDrawResponse
+	var ret withDrawResponse
 	if err := c.decodeResponse(resp, &ret, nil); err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ type WithdrawRequest struct {
 	Address  string
 }
 
-type WithDrawResponse struct {
+type withDrawResponse struct {
 	Error    string
 	Response string
 }
@@ -155,7 +155,7 @@ func (c *Client) Order(ctx context.Context, order OrderRequest) (*Order, error) 
 		return nil, err
 	}
 
-	var ret OrderResponse
+	var ret orderResponse
 	if err := c.decodeResponse(resp, &ret, nil); err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ type OrderRequest struct {
 	PostOnly          bool
 }
 
-type OrderResponse struct {
+type orderResponse struct {
 	Error string `json:"error"`
 	Order
 }

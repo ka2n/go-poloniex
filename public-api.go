@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// GetTickers returns latest tickers
 func (c *Client) GetTickers(ctx context.Context) (*Tickers, error) {
 	req, err := c.newPublicAPIRequest(ctx, "returnTicker", nil)
 	if err != nil {
@@ -30,10 +31,12 @@ func (c *Client) GetTickers(ctx context.Context) (*Tickers, error) {
 	return &ret, nil
 }
 
+// Tickers holds map of Ticker
 type Tickers struct {
 	Pair map[string]Ticker
 }
 
+// Ticker represent ticker
 type Ticker struct {
 	Last          string    `json:"last"`
 	LowestAsk     string    `json:"lowestAsk"`
@@ -47,6 +50,7 @@ type Ticker struct {
 	Time          time.Time `json:"-"`
 }
 
+// GetCurrencies returns all currencies available
 func (c *Client) GetCurrencies(ctx context.Context) (*Currencies, error) {
 	req, err := c.newPublicAPIRequest(ctx, "returnCurrencies", nil)
 	if err != nil {
@@ -70,6 +74,7 @@ func (c *Client) GetCurrencies(ctx context.Context) (*Currencies, error) {
 	return &ret, nil
 }
 
+// Currency represent currency profile
 type Currency struct {
 	ID             int     `json:"id"`
 	Name           string  `json:"name"`
@@ -81,6 +86,7 @@ type Currency struct {
 	Delisted       int     `json:"delisted"`
 }
 
+// Currencies holds map of Currency
 type Currencies struct {
 	Pair map[string]Currency
 }
