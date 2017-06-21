@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// GetBalances returns all of available balances.
 func (c *Client) GetBalances(ctx context.Context) (*Balances, error) {
 	resp, err := c.doPrivateAPIRequest(ctx, "returnBalances", nil)
 	if err != nil {
@@ -35,8 +36,39 @@ func (c *Client) GetBalances(ctx context.Context) (*Balances, error) {
 	return &balance, nil
 }
 
+// Balances is a pair of symbol with ammount.
 type Balances struct {
 	Pair map[string]float64
+}
+
+// GetCompleteBalances returns all of balances, including available balance,
+// balance on orders, and the estimated BTC value of balance.
+func (c *Client) GetCompleteBalances(ctx context.Context) (CompleteBalances, error) {
+	resp, err := c.doPrivateAPIRequest(ctx, "returnCompleteBalances", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(resp.Status)
+	}
+
+	var ret CompleteBalances
+	if err := c.decodeResponse(resp, &ret, nil); err != nil {
+		return nil, err
+	}
+	return ret, nil
+}
+
+// CompleteBalances is a pair of symbol with Balance.
+type CompleteBalances map[string]Balance
+
+// A Balance is including available balance, balance on order, and the
+// estimated BTC value of balance.
+type Balance struct {
+	Available string
+	OnOrders  string
+	BtcValue  string
 }
 
 func (c *Client) Withdraw(ctx context.Context, req WithdrawRequest) error {
