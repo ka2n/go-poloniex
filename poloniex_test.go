@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -54,6 +55,20 @@ func TestClient_GetBalances(t *testing.T) {
 	}
 }
 
+func TestClient_GetBalancesError(t *testing.T) {
+	server, client := newMockedClient([]mockResponse{
+		{Action: "returnBalances", PrivateAPI: true, BodyFile: "testdata/error.json"},
+	})
+	defer server.Close()
+
+	ctx := context.Background()
+	_, err := client.GetBalances(ctx)
+
+	if err == nil || !strings.Contains(err.Error(), "test_error") {
+		t.Errorf("expect error contains test_error, got %v", err)
+	}
+}
+
 func TestClient_GetCompleteBalances(t *testing.T) {
 	server, client := newMockedClient([]mockResponse{
 		{Action: "returnCompleteBalances", PrivateAPI: true, BodyFile: "testdata/returnCompleteBalances.json"},
@@ -88,6 +103,20 @@ func TestClient_GetCompleteBalances(t *testing.T) {
 	}
 }
 
+func TestClient_GetCompleteBalancesError(t *testing.T) {
+	server, client := newMockedClient([]mockResponse{
+		{Action: "returnCompleteBalances", PrivateAPI: true, BodyFile: "testdata/error.json"},
+	})
+	defer server.Close()
+
+	ctx := context.Background()
+	_, err := client.GetCompleteBalances(ctx)
+
+	if err == nil || !strings.Contains(err.Error(), "test_error") {
+		t.Errorf("expect error contains test_error, got %v", err)
+	}
+}
+
 type mockResponse struct {
 	Action     string
 	PrivateAPI bool
@@ -114,6 +143,7 @@ func newMockedClient(mocks []mockResponse) (*httptest.Server, *Client) {
 		muxAPI.HandleFunc(req, func(w http.ResponseWriter, r *http.Request) {
 			if mock.Status != 0 {
 				w.WriteHeader(mock.Status)
+				return
 			}
 			http.ServeFile(w, r, mock.BodyFile)
 		})

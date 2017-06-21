@@ -2,6 +2,7 @@ package poloniex
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/url"
@@ -53,11 +54,37 @@ func (c *Client) GetCompleteBalances(ctx context.Context) (CompleteBalances, err
 		return nil, errors.New(resp.Status)
 	}
 
-	var ret CompleteBalances
+	var ret completeBalancesResponse
 	if err := c.decodeResponse(resp, &ret, nil); err != nil {
 		return nil, err
 	}
-	return ret, nil
+
+	if ret.Error != "" {
+		return nil, errors.New(ret.Error)
+	}
+	return ret.CompleteBalances, nil
+}
+
+type completeBalancesResponse struct {
+	CompleteBalances
+	Error string
+}
+
+func (c *completeBalancesResponse) UnmarshalJSON(data []byte) error {
+	type errorT struct {
+		Error string `json:"error,omitempty"`
+	}
+	var errResp errorT
+	if err := json.Unmarshal(data, &errResp); err != nil {
+		return err
+	}
+
+	if errResp.Error != "" {
+		c.Error = errResp.Error
+		return nil
+	}
+
+	return json.Unmarshal(data, &(c.CompleteBalances))
 }
 
 // CompleteBalances is a pair of symbol with Balance.
