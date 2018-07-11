@@ -74,7 +74,7 @@ func (c *PushAPIClient) receive() error {
 		return errors.New("already subscribed")
 	}
 
-	client, err := turnpike.NewWebsocketClient(turnpike.JSON, c.Endpoint, nil, nil)
+	client, err := turnpike.NewWebsocketClient(turnpike.JSON, c.Endpoint, nil, nil, nil)
 	if err != nil {
 		return err
 	}
